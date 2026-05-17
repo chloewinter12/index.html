@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1080, initial-scale=1.0">
+<title>ADRIÀ · MISIÓN DESBLOQUEADA</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --gold: #c8a84b;
+  --gold2: #e8cc6a;
+  --purple: #7c5acd;
+  --purple2: #b8a0ff;
+  --green: #4a9a5a;
+  --green2: #7cba8a;
+  --bg: #060810;
+  --bg2: #0d0f1e;
+  --bg3: #12152a;
+  --text: #d8d0b8;
+  --muted: #7870a0;
+  --red: #c04040;
+}
+
+html, body {
+  width: 1080px;
+  min-height: 1920px;
+  background: var(--bg);
+  overflow-x: hidden;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text);
+}
+
+/* ═══════════════════════════════ BG ELEMENTS ═══════════════════════════════ */
+.bg-layer {
+  position: fixed; inset: 0; width: 1080px; height: 1920px;
+  pointer-events: none; z-index: 0;
+}
+
+.bg-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(124,90,205,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,90,205,0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.bg-vignette {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(6,8,16,0.85) 100%);
+}
+
+.bg-scanlines {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 4px,
+    rgba(0,0,0,0.12) 4px, rgba(0,0,0,0.12) 5px
+  );
+}
+
+.bg-top-glow {
+  position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+  width: 900px; height: 600px;
+  background: radial-gradient(ellipse, rgba(100,70,220,0.15) 0%, transparent 70%);
+}
+
+/* ═══════════════════════════════ SCREENS ═══════════════════════════════ */
+.screen {
+  position: relative; z-index: 2;
+  width: 1080px; min-height: 1920px;
+  display: none;
+  flex-direction: column;
+  padding: 80px 80px 60px;
+}
+.screen.active { display: flex; }
+
+/* ═══════════════════════════════ SCREEN 0: INTRO ═══════════════════════════════ */
+.intro-wrap {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  flex: 1; text-align: center; gap: 0;
+}
+
+.intro-system-text {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px; color: var(--muted);
+  letter-spacing: 4px; margin-bottom: 60px;
+  animation: fadeIn 1s ease 0.2s both;
+}
+
+.intro-trophy {
+  font-size: 120px; margin-bottom: 40px;
+  animation: fadeIn 0.8s ease 0.6s both, pulse 3s ease-in-out 1.4s infinite;
+  filter: drop-shadow(0 0 40px rgba(200,168,75,0.5));
+}
+
+.intro-unlocked {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px; color: var(--gold);
+  letter-spacing: 6px; margin-bottom: 30px;
+  animation: fadeIn 0.8s ease 1s both;
+}
+
+.intro-player {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 52px; color: #ffffff;
+  letter-spacing: 8px; margin-bottom: 16px;
+  animation: fadeIn 0.8s ease 1.3s both;
+  text-shadow: 0 0 60px rgba(184,160,255,0.6), 0 0 120px rgba(124,90,205,0.3);
+}
+
+.intro-subtitle {
+  font-size: 28px; color: var(--purple2);
+  margin-bottom: 80px;
+  animation: fadeIn 0.8s ease 1.6s both;
+}
+
+.intro-message {
+  max-width: 780px;
+  background: rgba(13,15,30,0.9);
+  border: 1px solid rgba(124,90,205,0.4);
+  border-radius: 4px;
+  padding: 48px 56px;
+  text-align: left;
+  animation: fadeIn 0.8s ease 1.9s both;
+  position: relative;
+}
+
+.intro-message::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--purple), var(--gold), var(--purple), transparent);
+}
+
+.intro-flavor {
+  font-size: 24px; line-height: 1.8; color: var(--text);
+  margin-bottom: 32px;
+}
+
+.intro-flavor em {
+  color: var(--gold2); font-style: normal;
+}
+
+.intro-warning {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px; color: var(--green2);
+  letter-spacing: 2px;
+  animation: blink 1.4s step-end infinite;
+}
+
+/* ═══════════════════════════════ SCREEN 1: MISSION ═══════════════════════════════ */
+.section-header {
+  margin-bottom: 48px;
+}
+
+.breadcrumb {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px; color: var(--muted);
+  letter-spacing: 3px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+
+.breadcrumb-sep { color: var(--purple); }
+
+.page-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 28px; color: var(--gold);
+  letter-spacing: 3px; margin-bottom: 8px;
+  text-shadow: 0 0 30px rgba(200,168,75,0.4);
+}
+
+.title-rule {
+  height: 1px; width: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--purple), transparent);
+  margin-top: 12px;
+}
+
+/* Mission screen */
+.mission-header-block {
+  background: var(--bg3);
+  border: 1px solid rgba(124,90,205,0.35);
+  border-radius: 4px;
+  padding: 44px 52px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.mission-header-block::after {
+  content: 'SECONDARY QUEST';
+  position: absolute; right: -32px; top: 32px;
+  transform: rotate(90deg);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px; color: rgba(124,90,205,0.25);
+  letter-spacing: 4px;
+}
+
+.mission-type {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px; color: var(--green2);
+  letter-spacing: 3px; margin-bottom: 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+
+.mission-type::before {
+  content: '▹'; color: var(--green);
+}
+
+.mission-name {
+  font-size: 54px; color: #fff;
+  line-height: 1.15; margin-bottom: 32px;
+  text-shadow: 0 0 40px rgba(255,255,255,0.1);
+}
+
+.mission-tags {
+  display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 0;
+}
+
+.tag {
+  background: rgba(124,90,205,0.15);
+  border: 1px solid rgba(124,90,205,0.4);
+  border-radius: 3px;
+  padding: 8px 20px;
+  font-size: 20px; color: var(--purple2);
+}
+
+/* Objectives */
+.objectives-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px; color: var(--purple2);
+  letter-spacing: 3px; margin-bottom: 28px;
+  display: flex; align-items: center; gap: 14px;
+}
+.objectives-title::before { content: '▸'; color: var(--purple); }
+
+.objectives-list {
+  display: flex; flex-direction: column; gap: 16px;
+  margin-bottom: 52px;
+}
+
+.obj-row {
+  display: grid; grid-template-columns: 36px 1fr;
+  gap: 0 18px; align-items: start;
+  background: rgba(13,15,30,0.6);
+  border: 1px solid rgba(124,90,205,0.18);
+  border-radius: 3px;
+  padding: 20px 24px;
+}
+
+.obj-num {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px; color: var(--purple);
+  padding-top: 3px;
+}
+
+.obj-text { font-size: 22px; color: var(--text); line-height: 1.4; }
+
+/* XP reward */
+.reward-block {
+  background: rgba(200,168,75,0.06);
+  border: 1px solid rgba(200,168,75,0.3);
+  border-radius: 4px;
+  padding: 36px 44px;
+  display: flex; align-items: center; gap: 40px;
+}
+
+.reward-icon { font-size: 56px; }
+
+.reward-info { flex: 1; }
+
+.reward-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px; color: var(--gold);
+  letter-spacing: 3px; margin-bottom: 10px;
+}
+
+.reward-desc { font-size: 21px; color: var(--text); line-height: 1.5; }
+
+/* ═══════════════════════════════ SCREEN 2: CHARACTER ═══════════════════════════════ */
+.char-layout {
+  display: flex; gap: 64px; flex: 1;
+}
+
+.char-left { flex-shrink: 0; width: 340px; }
+
+/* Portrait */
+.portrait-container {
+  width: 340px; height: 460px;
+  position: relative; margin-bottom: 32px;
+}
+
+.portrait-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, #0d102a 0%, #07091a 100%);
+  border: 1px solid rgba(124,90,205,0.5);
+  border-radius: 4px;
+}
+
+.portrait-inner-glow {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 60%;
+  background: radial-gradient(ellipse at 50% 100%, rgba(100,70,200,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.portrait-corners span {
+  position: absolute;
+  width: 22px; height: 22px;
+  border-color: var(--gold);
+  border-style: solid;
+}
+.portrait-corners span:nth-child(1) { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+.portrait-corners span:nth-child(2) { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
+.portrait-corners span:nth-child(3) { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
+.portrait-corners span:nth-child(4) { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+
+.portrait-svg-wrap {
+  position: absolute; inset: 1px;
+  border-radius: 3px; overflow: hidden;
+  display: flex; align-items: flex-end; justify-content: center;
+}
+
+.portrait-label-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(0deg, rgba(6,8,16,0.95) 0%, transparent 100%);
+  padding: 20px 16px 14px;
+  display: flex; justify-content: space-between; align-items: flex-end;
+}
+
+.portrait-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px; color: var(--gold);
+  line-height: 1.7;
+}
+
+.portrait-class {
+  font-size: 16px; color: var(--purple2);
+  text-align: right;
+}
+
+/* Health/MP bars */
+.vitals { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+
+.vital-row { display: grid; grid-template-columns: 48px 1fr 52px; gap: 0 12px; align-items: center; }
+
+.vital-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; color: var(--muted);
+}
+
+.vital-bar-wrap {
+  height: 14px;
+  background: rgba(13,15,30,0.8);
+  border: 1px solid rgba(124,90,205,0.3);
+  border-radius: 2px; overflow: hidden;
+}
+
+.vital-bar { height: 100%; border-radius: 1px; }
+.vital-hp { background: linear-gradient(90deg, #a03030, #c84040); }
+.vital-mp { background: linear-gradient(90deg, #3a30c0, #6050e8); }
+.vital-xp { background: linear-gradient(90deg, #806000, #c8a84b); }
+
+.vital-val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; color: var(--muted); text-align: right;
+}
+
+/* Char right side */
+.char-right { flex: 1; display: flex; flex-direction: column; gap: 0; }
+
+.char-name-block { margin-bottom: 32px; }
+
+.char-fullname {
+  font-size: 42px; color: #fff; line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.char-title-role {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px; color: var(--green2);
+  letter-spacing: 2px;
+}
+
+/* Stats */
+.stats-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px; color: var(--muted);
+  letter-spacing: 3px; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+}
+.stats-title::before { content: '▸'; color: var(--purple); }
+
+.stat-row {
+  display: grid; grid-template-columns: 220px 1fr 60px;
+  gap: 0 16px; align-items: center;
+  margin-bottom: 16px;
+}
+
+.stat-name { font-size: 20px; color: var(--muted); }
+
+.stat-bar-wrap {
+  height: 12px;
+  background: rgba(13,15,30,0.8);
+  border: 1px solid rgba(124,90,205,0.25);
+  border-radius: 1px; overflow: hidden;
+}
+
+.stat-bar { height: 100%; border-radius: 1px; transition: width 1s ease; }
+.bar-purple { background: linear-gradient(90deg, #5a3aaa, #9a70ee); }
+.bar-blue   { background: linear-gradient(90deg, #2a5aaa, #4a80dd); }
+.bar-chaos  { background: linear-gradient(90deg, #802090, #c040e0); }
+.bar-green  { background: linear-gradient(90deg, #2a7a3a, #5aba6a); }
+.bar-gold   { background: linear-gradient(90deg, #806020, #c8a84b); }
+
+.stat-val {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px; color: var(--text); text-align: right;
+}
+
+/* Abilities */
+.abilities-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px; color: var(--muted);
+  letter-spacing: 3px; margin: 32px 0 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+.abilities-title::before { content: '▸'; color: var(--purple); }
+
+.abilities-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin-bottom: 32px;
+}
+
+.ability-chip {
+  background: rgba(13,15,30,0.7);
+  border: 1px solid rgba(124,90,205,0.3);
+  border-radius: 3px;
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+
+.ability-icon { font-size: 20px; }
+
+.ability-text { font-size: 17px; color: var(--text); }
+
+/* Lore */
+.lore-box {
+  background: rgba(13,15,30,0.8);
+  border: 1px solid rgba(124,90,205,0.25);
+  border-left: 2px solid var(--purple);
+  border-radius: 0 3px 3px 0;
+  padding: 28px 32px;
+}
+
+.lore-header {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px; color: var(--purple2);
+  letter-spacing: 3px; margin-bottom: 14px;
+}
+
+.lore-text { font-size: 19px; color: var(--muted); line-height: 1.7; }
+
+.lore-text em { color: var(--text); font-style: normal; }
+
+/* ═══════════════════════════════ NAVIGATION ═══════════════════════════════ */
+.nav-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: auto; padding-top: 48px;
+  border-top: 1px solid rgba(124,90,205,0.2);
+}
+
+.nav-btn {
+  background: rgba(13,15,30,0.8);
+  border: 1px solid rgba(124,90,205,0.5);
+  border-radius: 4px;
+  color: var(--purple2);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  padding: 18px 40px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  letter-spacing: 2px;
+  display: flex; align-items: center; gap: 12px;
+}
+
+.nav-btn:hover { background: rgba(124,90,205,0.2); border-color: var(--purple2); }
+.nav-btn.hidden { opacity: 0; pointer-events: none; }
+
+.nav-center { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+.nav-dots { display: flex; gap: 10px; }
+
+.dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: rgba(124,90,205,0.2);
+  border: 1px solid rgba(124,90,205,0.5);
+  transition: background 0.3s;
+}
+.dot.active { background: var(--purple2); }
+
+.nav-hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px; color: var(--muted); letter-spacing: 2px;
+}
+
+/* ═══════════════════════════════ SHARED ═══════════════════════════════ */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+
+.fade-in { animation: fadeIn 0.6s ease both; }
+</style>
+</head>
+<body>
+
+<div class="bg-layer">
+  <div class="bg-grid"></div>
+  <div class="bg-top-glow"></div>
+  <div class="bg-vignette"></div>
+  <div class="bg-scanlines"></div>
+</div>
+
+<!-- ═══════════════ SCREEN 0: INTRO ═══════════════ -->
+<div class="screen active" id="screen0">
+  <div class="intro-wrap">
+    <div class="intro-system-text">SISTEMA · REGISTRO DE MISIONES</div>
+    <div class="intro-trophy">🏆</div>
+    <div class="intro-unlocked">✦ MISIÓN DESBLOQUEADA ✦</div>
+    <div class="intro-player">ADRIÀ</div>
+    <div class="intro-subtitle">has recibido un encargo especial</div>
+
+    <div class="intro-message">
+      <p class="intro-flavor">
+        Llevabas tiempo explorando el mundo del <em>arte visual generativo</em>.<br><br>
+        Alguien que conoce bien tu camino ha decidido darte acceso a algo diferente:<br>
+        una <em>sesión a medida</em>, diseñada solo para ti, con uno de los magos del sistema.<br><br>
+        No es un tutorial. No es un curso.<br>
+        Es una <em>misión personalizada</em> que empieza con tu propio proyecto.
+      </p>
+      <div class="intro-warning">▸ PULSA CONTINUAR PARA VER LOS DETALLES ◂</div>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <div class="nav-btn hidden">‹</div>
+    <div class="nav-center">
+      <div class="nav-dots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <div class="nav-hint">1 / 3</div>
+    </div>
+    <button class="nav-btn" onclick="goTo(1)">CONTINUAR ›</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 1: MISSION ═══════════════ -->
+<div class="screen" id="screen1">
+
+  <div class="section-header">
+    <div class="breadcrumb">
+      <span>REGISTRO</span><span class="breadcrumb-sep">›</span>
+      <span>MISIONES SECUNDARIAS</span>
+    </div>
+    <div class="page-title">DETALLES DE MISIÓN</div>
+    <div class="title-rule"></div>
+  </div>
+
+  <div class="mission-header-block">
+    <div class="mission-type">FORMACIÓN ESPECIAL · SESIÓN INTENSIVA</div>
+    <div class="mission-name">Arte Visual<br>con TouchDesigner</div>
+    <div class="mission-tags">
+      <span class="tag">📅 Sáb 6 jun · 11:00h</span>
+      <span class="tag">👤 2 jugadores</span>
+      <span class="tag">🌐 Online</span>
+    </div>
+  </div>
+
+  <div class="objectives-title">OBJETIVOS DE MISIÓN</div>
+  <div class="objectives-list">
+    <div class="obj-row">
+      <span class="obj-num">01</span>
+      <span class="obj-text">Preparación previa en base a briefing previo del proyecto</span>
+    </div>
+    <div class="obj-row">
+      <span class="obj-num">02</span>
+      <span class="obj-text">Revisión del estado actual del proyecto</span>
+    </div>
+    <div class="obj-row">
+      <span class="obj-num">03</span>
+      <span class="obj-text">TouchDesigner y audio-reactividad en profundidad</span>
+    </div>
+    <div class="obj-row">
+      <span class="obj-num">04</span>
+      <span class="obj-text">IA generativa en directo con el mago del sistema</span>
+    </div>
+    <div class="obj-row">
+      <span class="obj-num">05</span>
+      <span class="obj-text">ComfyUI para generación de assets visuales</span>
+    </div>
+    <div class="obj-row">
+      <span class="obj-num">06</span>
+      <span class="obj-text">Próximos pasos para desarrollo del sistema y proyecto</span>
+    </div>
+    <div class="obj-row">
+      <span class="obj-num">07</span>
+      <span class="obj-text">Sesiones extraordinarias de seguimiento para revisar avances y resolver dudas</span>
+    </div>
+  </div>
+
+  <div class="reward-block">
+    <div class="reward-icon">⚡</div>
+    <div class="reward-info">
+      <div class="reward-label">▸ RECOMPENSA AL COMPLETAR</div>
+      <div class="reward-desc">Dominio expandido del sistema. Tu proyecto audiovisual,<br>llevado al siguiente nivel.</div>
+    </div>
+    <div style="font-family:'Press Start 2P',monospace; font-size:11px; color:var(--gold); text-align:right; line-height:1.8;">
+      +2000 XP<br>
+      <span style="color:var(--purple2)">HABILIDAD<br>DESBLOQUEADA</span>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="nav-btn" onclick="goTo(0)">‹ INTRO</button>
+    <div class="nav-center">
+      <div class="nav-dots">
+        <div class="dot"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div>
+      </div>
+      <div class="nav-hint">2 / 3</div>
+    </div>
+    <button class="nav-btn" onclick="goTo(2)">PERSONAJE ›</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 2: CHARACTER ═══════════════ -->
+<div class="screen" id="screen2">
+
+  <div class="section-header">
+    <div class="breadcrumb">
+      <span>REGISTRO</span><span class="breadcrumb-sep">›</span>
+      <span>SELECCIÓN DE PERSONAJE</span>
+    </div>
+    <div class="page-title">TU MAESTRO</div>
+    <div class="title-rule"></div>
+  </div>
+
+  <div class="char-layout">
+
+    <!-- LEFT: portrait + vitals -->
+    <div class="char-left">
+      <div class="portrait-container">
+        <div class="portrait-bg"></div>
+        <div class="portrait-corners">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="portrait-svg-wrap">
+          <!-- Low-poly PS2-era character portrait -->
+          <svg viewBox="0 0 340 460" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+            <defs>
+              <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#1a1440"/>
+                <stop offset="100%" stop-color="#07091a"/>
+              </linearGradient>
+              <linearGradient id="skinGrad" x1="0" y1="0" x2="0.3" y2="1">
+                <stop offset="0%" stop-color="#d4a878"/>
+                <stop offset="50%" stop-color="#c8945e"/>
+                <stop offset="100%" stop-color="#a87040"/>
+              </linearGradient>
+              <linearGradient id="hairGrad" x1="0.2" y1="0" x2="0.8" y2="1">
+                <stop offset="0%" stop-color="#d4b060"/>
+                <stop offset="40%" stop-color="#c09840"/>
+                <stop offset="100%" stop-color="#806020"/>
+              </linearGradient>
+              <linearGradient id="clothGrad" x1="0" y1="0" x2="0.2" y2="1">
+                <stop offset="0%" stop-color="#2a2050"/>
+                <stop offset="50%" stop-color="#1e183a"/>
+                <stop offset="100%" stop-color="#12101e"/>
+              </linearGradient>
+              <linearGradient id="glowGrad" x1="0.5" y1="0" x2="0.5" y2="1">
+                <stop offset="0%" stop-color="rgba(100,70,200,0)" />
+                <stop offset="100%" stop-color="rgba(100,70,200,0.35)" />
+              </linearGradient>
+            </defs>
+
+            <!-- Background -->
+            <rect width="340" height="460" fill="url(#bgGrad)"/>
+
+            <!-- Ambient floor glow -->
+            <ellipse cx="170" cy="440" rx="120" ry="30" fill="rgba(100,70,200,0.2)"/>
+
+            <!-- Scanline texture overlay -->
+            <rect width="340" height="460" fill="url(#glowGrad)" opacity="0.6"/>
+
+            <!-- ─── BODY ─── -->
+            <!-- Coat / dark clothing - low poly facets -->
+            <polygon points="68,460 78,300 100,270 170,255 240,270 262,300 272,460" fill="#1a1535"/>
+            <polygon points="78,300 100,270 170,260 100,340" fill="#221a45"/>
+            <polygon points="262,300 240,270 170,260 240,340" fill="#16122c"/>
+            <polygon points="100,340 170,260 240,340 210,460 130,460" fill="#1e183a"/>
+            <!-- Collar -->
+            <polygon points="130,268 170,255 210,268 190,290 150,290" fill="#2e2460"/>
+            <!-- Shirt under collar -->
+            <polygon points="150,290 190,290 185,320 155,320" fill="#3a2070"/>
+
+            <!-- ─── NECK ─── -->
+            <polygon points="148,230 192,230 196,258 144,258" fill="#c8945e"/>
+            <!-- Neck shadow -->
+            <polygon points="148,244 192,244 196,258 144,258" fill="#a07040"/>
+
+            <!-- ─── HEAD - low poly facets ─── -->
+            <!-- Main face planes -->
+            <!-- Forehead center -->
+            <polygon points="135,110 205,110 210,145 130,145" fill="#d4a060"/>
+            <!-- Cheek left -->
+            <polygon points="102,145 135,110 130,145 108,190" fill="#c89050"/>
+            <!-- Cheek right -->
+            <polygon points="238,145 205,110 210,145 232,190" fill="#b07840"/>
+            <!-- Center face -->
+            <polygon points="130,145 210,145 215,200 125,200" fill="#d4a060"/>
+            <!-- Lower face left -->
+            <polygon points="108,190 130,145 125,200 112,225" fill="#c89050"/>
+            <!-- Lower face right -->
+            <polygon points="232,190 210,145 215,200 228,225" fill="#b07840"/>
+            <!-- Chin/jaw -->
+            <polygon points="125,200 215,200 210,235 130,235" fill="#c89050"/>
+            <!-- Chin point -->
+            <polygon points="130,235 210,235 170,250" fill="#b07840"/>
+            <!-- Jaw sides -->
+            <polygon points="112,225 125,200 130,235 120,240" fill="#a07040"/>
+            <polygon points="228,225 215,200 210,235 220,240" fill="#906030"/>
+
+            <!-- ─── HAIR ─── low poly sections ─── -->
+            <!-- Top skull -->
+            <polygon points="110,110 170,75 230,110 205,110 135,110" fill="#c09840"/>
+            <!-- Hair left side -->
+            <polygon points="96,140 110,110 135,110 108,190 95,170" fill="#a88030"/>
+            <!-- Hair right side -->
+            <polygon points="244,140 230,110 205,110 232,190 245,170" fill="#906020"/>
+            <!-- Top highlight facet -->
+            <polygon points="140,80 170,75 200,80 190,105 150,105" fill="#d4b060"/>
+            <!-- Hair volume left -->
+            <polygon points="90,160 96,140 108,190 88,200 85,180" fill="#906020"/>
+            <!-- Hair volume right -->
+            <polygon points="250,160 244,140 232,190 252,200 255,180" fill="#7a5010"/>
+
+            <!-- Long hair falling down -->
+            <!-- Left strand -->
+            <polygon points="88,200 108,190 100,280 70,310 72,260" fill="#a08028"/>
+            <polygon points="70,310 100,280 92,360 65,380" fill="#806018"/>
+            <!-- Right strand -->
+            <polygon points="252,200 232,190 240,280 268,310" fill="#906020"/>
+            <polygon points="268,310 240,280 248,360 272,380" fill="#7a5010"/>
+
+            <!-- Ponytail going up-back -->
+            <polygon points="195,90 220,75 235,50 218,40 202,60 190,80" fill="#c09840"/>
+            <polygon points="218,40 235,50 240,20 220,15 210,32" fill="#b08030"/>
+            <polygon points="220,15 240,20 238,5 222,8" fill="#d4b060"/>
+
+            <!-- Hair elastic -->
+            <ellipse cx="215" cy="72" rx="12" ry="8" fill="#5a3010" transform="rotate(-20,215,72)"/>
+
+            <!-- ─── EYES ─── -->
+            <!-- Eye sockets / shadow -->
+            <ellipse cx="140" cy="168" rx="22" ry="14" fill="#9a6030" opacity="0.5"/>
+            <ellipse cx="200" cy="168" rx="22" ry="14" fill="#9a6030" opacity="0.5"/>
+
+            <!-- Eye whites -->
+            <ellipse cx="140" cy="168" rx="17" ry="11" fill="#e8e0d0"/>
+            <ellipse cx="200" cy="168" rx="17" ry="11" fill="#e8e0d0"/>
+
+            <!-- Iris - low poly style (flat blue-grey) -->
+            <polygon points="128,162 140,157 152,162 152,174 140,179 128,174" fill="#4a7ab0"/>
+            <polygon points="188,162 200,157 212,162 212,174 200,179 188,174" fill="#4a7ab0"/>
+
+            <!-- Iris highlight facet -->
+            <polygon points="133,161 140,157 147,161 140,166" fill="#6a9ad0"/>
+            <polygon points="193,161 200,157 207,161 200,166" fill="#6a9ad0"/>
+
+            <!-- Pupils -->
+            <ellipse cx="140" cy="168" rx="7" ry="8" fill="#0a1828"/>
+            <ellipse cx="200" cy="168" rx="7" ry="8" fill="#0a1828"/>
+
+            <!-- Eye shine -->
+            <polygon points="134,162 138,160 142,164 138,166" fill="rgba(255,255,255,0.7)"/>
+            <polygon points="194,162 198,160 202,164 198,166" fill="rgba(255,255,255,0.7)"/>
+
+            <!-- Eyebrows - angled low poly -->
+            <polygon points="118,148 145,142 150,147 124,153" fill="#8a6010"/>
+            <polygon points="190,142 218,148 214,153 186,147" fill="#8a6010"/>
+
+            <!-- ─── NOSE ─── -->
+            <polygon points="162,178 178,178 174,200 166,200" fill="#b07840"/>
+            <polygon points="158,198 170,204 170,200 162,196" fill="#906030"/>
+            <polygon points="182,198 170,204 170,200 178,196" fill="#906030"/>
+
+            <!-- ─── MOUTH ─── -->
+            <polygon points="148,215 170,210 192,215 184,222 170,224 156,222" fill="#c07060"/>
+            <polygon points="156,222 170,224 184,222 178,230 170,232 162,230" fill="#a05040"/>
+
+            <!-- ─── HANDS / slight suggestion ─── -->
+            <polygon points="68,380 82,340 96,370 88,410 70,420" fill="#c8945e"/>
+            <polygon points="272,380 258,340 244,370 252,410 270,420" fill="#b07840"/>
+
+            <!-- RUNE / magic symbol on chest -->
+            <circle cx="170" cy="340" r="28" fill="none" stroke="rgba(160,120,255,0.4)" stroke-width="1.5"/>
+            <circle cx="170" cy="340" r="20" fill="none" stroke="rgba(160,120,255,0.25)" stroke-width="1"/>
+            <polygon points="170,318 183,335 178,355 162,355 157,335" fill="none" stroke="rgba(160,120,255,0.5)" stroke-width="1.5"/>
+            <circle cx="170" cy="340" r="4" fill="rgba(180,140,255,0.6)"/>
+          </svg>
+        </div>
+        <div class="portrait-inner-glow"></div>
+        <div class="portrait-label-bar">
+          <div class="portrait-name">DAVID<br>GONZÁLEZ V.</div>
+          <div class="portrait-class">Mago del Caos<br>Lv. 37</div>
+        </div>
+      </div>
+
+      <!-- Vitals -->
+      <div class="vitals">
+        <div class="vital-row">
+          <span class="vital-label">HP</span>
+          <div class="vital-bar-wrap"><div class="vital-bar vital-hp" style="width:88%"></div></div>
+          <span class="vital-val">880</span>
+        </div>
+        <div class="vital-row">
+          <span class="vital-label">MP</span>
+          <div class="vital-bar-wrap"><div class="vital-bar vital-mp" style="width:99%"></div></div>
+          <span class="vital-val">990</span>
+        </div>
+        <div class="vital-row">
+          <span class="vital-label">XP</span>
+          <div class="vital-bar-wrap"><div class="vital-bar vital-xp" style="width:72%"></div></div>
+          <span class="vital-val">7200</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: stats & lore -->
+    <div class="char-right">
+
+      <div class="char-name-block">
+        <div class="char-fullname">David González Vaca</div>
+        <div class="char-title-role">ARTISTA VISUAL · PROF. UB · MAGO DEL CAOS</div>
+      </div>
+
+      <div class="stats-title">ATRIBUTOS</div>
+
+      <div class="stat-row">
+        <span class="stat-name">TouchDesigner</span>
+        <div class="stat-bar-wrap"><div class="stat-bar bar-purple" style="width:97%"></div></div>
+        <span class="stat-val">97</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-name">IA Generativa</span>
+        <div class="stat-bar-wrap"><div class="stat-bar bar-blue" style="width:93%"></div></div>
+        <span class="stat-val">93</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-name">Blender / 3D</span>
+        <div class="stat-bar-wrap"><div class="stat-bar bar-blue" style="width:88%"></div></div>
+        <span class="stat-val">88</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-name">Magia del Caos</span>
+        <div class="stat-bar-wrap"><div class="stat-bar bar-chaos" style="width:99%"></div></div>
+        <span class="stat-val">99</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-name">Didáctica</span>
+        <div class="stat-bar-wrap"><div class="stat-bar bar-green" style="width:91%"></div></div>
+        <span class="stat-val">91</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-name">Paciencia</span>
+        <div class="stat-bar-wrap"><div class="stat-bar bar-green" style="width:90%"></div></div>
+        <span class="stat-val">90</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-name">Física / Informática</span>
+        <div class="stat-bar-wrap"><div class="stat-bar bar-gold" style="width:85%"></div></div>
+        <span class="stat-val">85</span>
+      </div>
+
+      <div class="abilities-title">HABILIDADES ESPECIALES</div>
+      <div class="abilities-grid">
+        <div class="ability-chip"><span class="ability-icon">🔮</span><span class="ability-text">Node-based magic</span></div>
+        <div class="ability-chip"><span class="ability-icon">🌀</span><span class="ability-text">Chaos Sigil Craft</span></div>
+        <div class="ability-chip"><span class="ability-icon">⚡</span><span class="ability-text">Audio Reactivity</span></div>
+        <div class="ability-chip"><span class="ability-icon">🧬</span><span class="ability-text">Generative Systems</span></div>
+      </div>
+
+      <div class="lore-box">
+        <div class="lore-header">▸ LORE DEL PERSONAJE</div>
+        <div class="lore-text">
+          Artista multidisciplinar formado en <em>Física e Informática</em>. Desde 2021, profesor asociado en la Universitat de Barcelona. Su obra fusiona <em>instalaciones interactivas</em> con inteligencia artificial y <em>Magia del Caos</em>, construidas sobre sistemas visuales de nodos: TouchDesigner, ComfyUI y Blender.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="nav-btn" onclick="goTo(1)">‹ MISIÓN</button>
+    <div class="nav-center">
+      <div class="nav-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot active"></div>
+      </div>
+      <div class="nav-hint">3 / 3</div>
+    </div>
+    <div class="nav-btn hidden">›</div>
+  </div>
+
+</div>
+
+<script>
+function goTo(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen' + n).classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
